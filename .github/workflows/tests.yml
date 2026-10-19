@@ -1,0 +1,23 @@
+name: PHP tests
+on:
+  push:
+  pull_request:
+jobs:
+  php:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, intl, dom, sqlite3, pdo_sqlite
+          tools: composer:v2
+          coverage: none
+      - name: Install development dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Check PHP syntax
+        run: find src tests -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: Dependency-free pricing checks
+        run: php tests/smoke.php
+      - name: PHPUnit unit and SQLite integration suite
+        run: vendor/bin/phpunit

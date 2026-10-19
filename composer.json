@@ -1,0 +1,33 @@
+{
+    "name": "elig45/bagisto-laposte-shipping",
+    "description": "La Poste Lettre verte suivie carrier with global weight-based pricing for Bagisto 2.4",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.3 <8.5",
+        "illuminate/support": "^12.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.0",
+        "orchestra/testbench": "^10.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "MEJF\\LaPosteShipping\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "MEJF\\LaPosteShipping\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "MEJF\\LaPosteShipping\\Providers\\LaPosteShippingServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
