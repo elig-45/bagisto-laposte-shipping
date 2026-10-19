@@ -26,7 +26,7 @@ final class RateHistoryTest extends TestCase
     {
         parent::setUp();
         Schema::create('laposte_rate_cards', static function (Blueprint $t): void {
-            $t->id(); $t->string('zone');
+            $t->id(); $t->string('service_code')->default('lettre_verte_suivie'); $t->string('zone');
             $t->string('source_url'); $t->date('effective_from'); $t->boolean('enabled'); $t->timestamps();
         });
         Schema::create('laposte_rate_tiers', static function (Blueprint $t): void {
@@ -39,6 +39,7 @@ final class RateHistoryTest extends TestCase
     private function card(string $from, int $classic): RateCard
     {
         $card = RateCard::create([
+            'service_code'=>'lettre_verte_suivie',
             'zone'=>'metropolitan_france',
             'source_url'=>'https://www.laposte.fr/tarif-lettre-suivie',
             'effective_from'=>$from, 'enabled'=>true,

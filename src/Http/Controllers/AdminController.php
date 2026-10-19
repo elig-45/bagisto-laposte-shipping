@@ -17,6 +17,7 @@ use Elig45\LaPosteShipping\Models\RateCard;
 use Elig45\LaPosteShipping\Services\CsvRates;
 use Elig45\LaPosteShipping\Services\Decimal;
 use Elig45\LaPosteShipping\Services\RateResolver;
+use Elig45\LaPosteShipping\Services\ServiceCatalog;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 final class AdminController extends Controller
@@ -24,9 +25,15 @@ final class AdminController extends Controller
     public function index(): View
     {
         $this->canView();
+        $services = ServiceCatalog::all();
+        foreach ($services as $serviceCode => $service) {
+            $services[$serviceCode]['default_csv'] = ServiceCatalog::defaultCsv($serviceCode);
+        }
+
         return view('laposte::admin', [
             'cards' => RateCard::with('tiers')->orderByDesc('effective_from')->paginate(25),
             'profiles' => ProductProfile::orderBy('product_id')->limit(100)->get(),
+            'services' => $services,
         ]);
     }
 
@@ -34,17 +41,19 @@ final class AdminController extends Controller
     {
         $this->canManage();
         $data = $this->validateGrid($request);
-        $rows = $this->decodeCsv($csv, $data['tiers_csv']);
+        $rows = $this->decodeCsv($csv, $data['tiers_csv'], $data['service_code']);
         $this->guardEffectiveDate($data['effective_from']);
 
         DB::transaction(function () use ($data, $rows): void {
-            $duplicate = RateCard::query()->where('zone', 'metropolitan_france')
+            $duplicate = RateCard::query()->where('service_code', $data['service_code'])
+                ->where('zone', 'metropolitan_france')
                 ->where('effective_from', $data['effective_from'])
                 ->lockForUpdate()->exists();
             if ($duplicate) {
                 throw ValidationException::withMessages(['effective_from' => trans('laposte::app.duplicate_date')]);
             }
             $card = RateCard::create([
+                'service_code' => $data['service_code'],
                 'zone' => 'metropolitan_france',
                 'source_url' => $data['source_url'],
                 'effective_from' => $data['effective_from'],
@@ -64,7 +73,7 @@ final class AdminController extends Controller
             'enabled' => ['required', 'boolean'],
             'tiers_csv' => ['required', 'string', 'max:32768'],
         ]);
-        $tiers = $this->decodeCsv($csv, $data['tiers_csv']);
+        $tiers = $this->decodeCsv($csv, $data['tiers_csv'], $card->service_code);
         DB::transaction(function () use ($card, $data, $tiers): void {
             $card->update(['source_url' => $data['source_url'], 'enabled' => (bool) $data['enabled']]);
             $card->tiers()->delete();
@@ -84,9 +93,14 @@ final class AdminController extends Controller
     public function import(Request $request, CsvRates $csv): RedirectResponse
     {
         $this->canManage();
-        $request->validate(['csv' => 'required|file|max:64|mimes:csv,txt']);
+        $request->validate([
+            'service_code' => ['required', Rule::in(array_keys(ServiceCatalog::all()))],
+            'effective_from' => 'required|date_format:Y-m-d|after:today',
+            'source_url' => ['required', 'url', 'max:500', 'regex:/^https:\/\//'],
+            'csv' => 'required|file|max:64|mimes:csv,txt',
+        ]);
         $raw = file_get_contents($request->file('csv')->getRealPath());
-        $this->decodeCsv($csv, (string) $raw);
+        $this->decodeCsv($csv, (string) $raw, (string) $request->input('service_code'));
         $request->merge(['tiers_csv' => $raw]);
         return $this->store($request, $csv);
     }
@@ -101,7 +115,7 @@ final class AdminController extends Controller
                 fputcsv($handle, [$tier->max_weight_g, $tier->classic_cents, $tier->online_cents, (int) $tier->enabled]);
             }
             fclose($handle);
-        }, 'laposte-'.$card->effective_from->format('Y-m-d').'.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
+        }, 'laposte-'.$card->service_code.'-'.$card->effective_from->format('Y-m-d').'.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
     }
 
     public function storeProfile(Request $request): RedirectResponse
@@ -110,9 +124,9 @@ final class AdminController extends Controller
         $data = $request->validate([
             'product_id' => 'required|integer|exists:products,id',
             'eligible' => 'required|boolean',
-            'length_mm' => 'required|integer|between:1,600',
-            'width_mm' => 'required|integer|between:1,600',
-            'thickness_mm' => 'required|integer|between:1,29',
+            'length_mm' => 'required|integer|between:1,1500',
+            'width_mm' => 'required|integer|between:1,1500',
+            'thickness_mm' => 'required|integer|between:1,1500',
             'packing_rule' => ['required', Rule::in(['flat_stack'])],
         ]);
         ProductProfile::updateOrCreate(['product_id' => $data['product_id']], $data);
@@ -130,12 +144,13 @@ final class AdminController extends Controller
     {
         $this->canView();
         $data = $request->validate([
-            'weight_g' => ['required', 'regex:/^\d{1,4}(\.\d{1,3})?$/'],
+            'service_code' => ['required', Rule::in(array_keys(ServiceCatalog::all()))],
+            'weight_g' => ['required', 'regex:/^\d{1,5}(\.\d{1,3})?$/'],
             'price_mode' => ['required', Rule::in(['classic', 'online'])],
         ]);
         try {
             $weight = Decimal::gramsMg($data['weight_g']);
-            $rate = $rates->resolve($weight, $data['price_mode']);
+            $rate = $rates->resolveForService($data['service_code'], $weight, $data['price_mode']);
         } catch (InvalidArgumentException) {
             $rate = null;
         }
@@ -157,16 +172,17 @@ final class AdminController extends Controller
     private function validateGrid(Request $request): array
     {
         return $request->validate([
+            'service_code' => ['required', Rule::in(array_keys(ServiceCatalog::all()))],
             'effective_from' => 'required|date_format:Y-m-d|after:today',
             'source_url' => ['required', 'url', 'max:500', 'regex:/^https:\/\//'],
             'tiers_csv' => 'required|string|max:32768',
         ]);
     }
 
-    private function decodeCsv(CsvRates $csv, string $content): array
+    private function decodeCsv(CsvRates $csv, string $content, string $serviceCode): array
     {
         try {
-            return $csv->parse($content);
+            return $csv->parse($content, $serviceCode);
         } catch (InvalidArgumentException $e) {
             throw ValidationException::withMessages(['tiers_csv' => $e->getMessage()]);
         }

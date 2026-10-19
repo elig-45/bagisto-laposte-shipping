@@ -9,8 +9,14 @@ use InvalidArgumentException;
 final class CsvRates
 {
     /** @return list<array{max_weight_g:int,classic_cents:int,online_cents:int,enabled:bool}> */
-    public function parse(string $csv): array
+    public function parse(string $csv, string $serviceCode = 'lettre_verte_suivie'): array
     {
+        $service = ServiceCatalog::get($serviceCode);
+        if (! $service) {
+            throw new InvalidArgumentException('Unknown shipping service.');
+        }
+
+        $maxWeight = (int) $service['max_weight_g'];
         if (strlen($csv) > 32768) {
             throw new InvalidArgumentException('CSV file too large.');
         }
@@ -31,15 +37,15 @@ final class CsvRates
                 throw new InvalidArgumentException('Invalid CSV tier row.');
             }
             [$weight, $classic, $online, $enabled] = array_map('intval', $parts);
-            if ($weight <= $previous || $weight > 2000 || $classic > 1_000_000
+            if ($weight <= $previous || $weight > $maxWeight || $classic > 1_000_000
                 || $online > 1_000_000 || ! in_array($enabled, [0, 1], true) || count($rows) >= 30) {
                 throw new InvalidArgumentException('Unsorted, duplicate, or invalid tier.');
             }
             $rows[] = ['max_weight_g' => $weight, 'classic_cents' => $classic, 'online_cents' => $online, 'enabled' => (bool) $enabled];
             $previous = $weight;
         }
-        if ($rows === [] || $previous !== 2000) {
-            throw new InvalidArgumentException('Last tier must end at 2000 g.');
+        if ($rows === [] || $previous !== $maxWeight) {
+            throw new InvalidArgumentException('Last tier must end at '.$maxWeight.' g.');
         }
         return $rows;
     }

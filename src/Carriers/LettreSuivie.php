@@ -4,44 +4,13 @@ declare(strict_types=1);
 
 namespace Elig45\LaPosteShipping\Carriers;
 
-use Elig45\LaPosteShipping\Services\QuoteCalculator;
-use Webkul\Checkout\Facades\Cart;
-use Webkul\Checkout\Models\CartShippingRate;
-use Webkul\Shipping\Carriers\AbstractShipping;
-
-final class LettreSuivie extends AbstractShipping
+final class LettreSuivie extends ConfiguredCarrier
 {
-    protected $code = QuoteCalculator::CODE;
-    protected $method = QuoteCalculator::METHOD;
+    protected $code = 'laposte_lettre_suivie';
+    protected $method = 'laposte_lettre_suivie_laposte_lettre_suivie';
 
-    public function calculate(): CartShippingRate|false
+    protected function serviceCode(): string
     {
-        $cart = Cart::getCart();
-        if (! $cart) {
-            return false;
-        }
-        $quote = app(QuoteCalculator::class)->quote($cart);
-        if ($quote === null) {
-            return false;
-        }
-
-        $rate = new CartShippingRate;
-        $rate->carrier = $this->code;
-        $rate->method = $this->method;
-        $rate->carrier_title = $rate->method_title = $this->getGlobal('title')
-            ?: 'La Poste – Lettre verte suivie';
-        $description = $this->getGlobal('description')
-            ?: 'Livraison suivie à domicile · Environ 3 jours ouvrables après expédition';
-        $rate->method_description = ($quote['cents'] === 0 ? trans('laposte::app.free').' · ' : '').$description;
-        $rate->base_price = $quote['cents'] / 100;
-        $rate->price = round((float) core()->convertPrice($rate->base_price), 4);
-        $rate->base_price_incl_tax = $rate->base_price;
-        $rate->price_incl_tax = $rate->price;
-        return $rate;
-    }
-
-    private function getGlobal(string $field): ?string
-    {
-        return core()->getConfigData('sales.carriers.'.$this->code.'.'.$field);
+        return 'lettre_verte_suivie';
     }
 }

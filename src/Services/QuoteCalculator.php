@@ -17,10 +17,16 @@ final class QuoteCalculator
     ) {}
 
     /** @return array{cents:int,weight_mg:int,rate_card_id:int}|null */
-    public function quote(object $cart): ?array
+    public function quote(object $cart, string $serviceCode = 'lettre_verte_suivie'): ?array
     {
-        if (! (bool) core()->getConfigData('sales.carriers.'.self::CODE.'.active')
-            || ! (bool) core()->getConfigData('sales.carriers.'.self::CODE.'.packing_confirmed')
+        $service = ServiceCatalog::get($serviceCode);
+        if (! $service) {
+            return null;
+        }
+
+        $configKey = 'sales.carriers.'.$service['carrier_code'].'.';
+        if (! (bool) core()->getConfigData($configKey.'active')
+            || ! (bool) core()->getConfigData($configKey.'packing_confirmed')
             || core()->getBaseCurrencyCode() !== 'EUR'
             || ! $cart->shipping_address
             || ! $cart->haveStockableItems()) {
@@ -36,11 +42,14 @@ final class QuoteCalculator
             'price_mode','allowed_destinations','packaging_weight_g','packaging_cost_eur',
             'surcharge_type','surcharge_value','free_threshold_eur','missing_weight_policy',
             'substitute_weight_g','envelope_length_mm','envelope_width_mm','envelope_thickness_mm',
+            'package_length_mm','package_width_mm','package_height_mm',
         ];
         $settings = [];
         foreach ($fields as $field) {
-            $settings[$field] = core()->getConfigData('sales.carriers.'.self::CODE.'.'.$field);
+            $settings[$field] = core()->getConfigData($configKey.$field);
         }
+        $settings['packing_type'] = $service['packing_type'];
+        $settings['max_weight_g'] = $service['max_weight_g'];
         if (($settings['allowed_destinations'] ?? null) !== 'metropolitan_france') {
             return null;
         }
@@ -48,7 +57,7 @@ final class QuoteCalculator
         if (! $physical) {
             return null;
         }
-        $rate = $this->rates->resolve($physical['weight_mg'], (string) ($settings['price_mode'] ?? 'classic'));
+        $rate = $this->rates->resolveForService($serviceCode, $physical['weight_mg'], (string) ($settings['price_mode'] ?? 'classic'));
         if (! $rate) {
             return null;
         }

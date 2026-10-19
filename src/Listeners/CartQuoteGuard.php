@@ -5,22 +5,23 @@ declare(strict_types=1);
 namespace Elig45\LaPosteShipping\Listeners;
 
 use Illuminate\Http\Exceptions\HttpResponseException;
-use Elig45\LaPosteShipping\Carriers\LettreSuivie;
-use Elig45\LaPosteShipping\Services\QuoteCalculator;
+use Elig45\LaPosteShipping\Services\ServiceCatalog;
 use Webkul\Tax\Facades\Tax;
 
 final class CartQuoteGuard
 {
     public function refresh(object $cart): void
     {
-        if ($cart->shipping_method !== QuoteCalculator::METHOD) {
+        $service = ServiceCatalog::fromMethod($cart->shipping_method);
+        if (! $service) {
             return;
         }
-        $existing = $cart->shipping_rates()->where('method', QuoteCalculator::METHOD)->first();
-        $fresh = (new LettreSuivie)->calculate();
+        $method = $service['method'];
+        $existing = $cart->shipping_rates()->where('method', $method)->first();
+        $fresh = app($service['class'])->calculate();
         // Exclude unselected or now unavailable method, without suppressing other carriers.
         if (! $existing || ! $fresh) {
-            $cart->shipping_rates()->where('method', QuoteCalculator::METHOD)->delete();
+            $cart->shipping_rates()->where('method', $method)->delete();
             $cart->unsetRelation('shipping_rates');
             return;
         }

@@ -19,10 +19,11 @@
         <h2 class="mb-3 text-xl font-semibold dark:text-white">@lang('laposte::app.rate_cards')</h2>
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm dark:text-gray-200">
-                <thead><tr><th class="p-2">@lang('laposte::app.effective_from')</th><th class="p-2">Source</th><th class="p-2">@lang('laposte::app.rates')</th><th class="p-2">CSV</th></tr></thead>
+                <thead><tr><th class="p-2">@lang('laposte::app.service')</th><th class="p-2">@lang('laposte::app.effective_from')</th><th class="p-2">Source</th><th class="p-2">@lang('laposte::app.rates')</th><th class="p-2">CSV</th></tr></thead>
                 <tbody>
                 @foreach($cards as $card)
                     <tr class="border-t align-top">
+                        <td class="p-2">@lang('laposte::app.service_'.$card->service_code)</td>
                         <td class="p-2">{{ $card->effective_from->format('Y-m-d') }}</td>
                         <td class="p-2"><a class="text-blue-600 underline" href="{{ $card->source_url }}" target="_blank" rel="noopener noreferrer">{{ parse_url($card->source_url, PHP_URL_HOST) }}</a></td>
                         <td class="p-2">
@@ -59,20 +60,27 @@
         @if(bouncer()->hasPermission('sales.laposte.manage'))
         <h3 class="mt-6 text-lg font-semibold dark:text-white">@lang('laposte::app.new_grid')</h3>
         <form method="POST" action="{{ route('admin.laposte.rates.store') }}" class="mt-3 grid gap-3">@csrf
+            <label class="block">@lang('laposte::app.service')<select id="laposte-grid-service" name="service_code" class="w-full rounded border p-2 dark:bg-gray-800" required>
+                @foreach($services as $serviceCode => $service)<option value="{{ $serviceCode }}" data-source="{{ $service['source_url'] }}" data-csv="{{ str_replace("\n", '|', $service['default_csv']) }}" @selected($serviceCode === 'lettre_verte_suivie')>@lang('laposte::app.service_'.$serviceCode)</option>@endforeach
+            </select></label>
             <label class="block">@lang('laposte::app.effective_from')<input name="effective_from" type="date" class="w-full rounded border p-2 dark:bg-gray-800" required></label>
-            <label class="block">Source HTTPS<input name="source_url" type="url" value="https://www.laposte.fr/tarif-lettre-suivie" class="w-full rounded border p-2 dark:bg-gray-800" required></label>
-            <label class="block">CSV (max_weight_g,classic_cents,online_cents,enabled)</label>
-            <textarea name="tiers_csv" rows="8" class="w-full rounded border p-2 font-mono dark:bg-gray-800" required>max_weight_g,classic_cents,online_cents,enabled
-20,202,199,1
-100,360,347,1
-250,574,568,1
-500,791,771,1
-1000,979,964,1
-2000,1164,1156,1</textarea>
+            <label class="block">Source HTTPS<input id="laposte-grid-source" name="source_url" type="url" value="https://www.laposte.fr/tarif-lettre-suivie" class="w-full rounded border p-2 dark:bg-gray-800" required></label>
+            <label class="block">CSV (max_weight_g,classic_cents,online_cents,enabled) — dernière tranche selon le service choisi</label>
+            <textarea id="laposte-grid-csv" name="tiers_csv" rows="8" class="w-full rounded border p-2 font-mono dark:bg-gray-800" required>{{ $services['lettre_verte_suivie']['default_csv'] }}</textarea>
             <button class="primary-button" type="submit">@lang('laposte::app.save')</button>
         </form>
+        <script>
+            document.getElementById('laposte-grid-service').addEventListener('change', function () {
+                const option = this.options[this.selectedIndex];
+                document.getElementById('laposte-grid-source').value = option.dataset.source;
+                document.getElementById('laposte-grid-csv').value = option.dataset.csv.split('|').join('\n');
+            });
+        </script>
         <h3 class="mt-6 text-lg font-semibold dark:text-white">@lang('laposte::app.import')</h3>
         <form action="{{ route('admin.laposte.rates.import') }}" method="POST" enctype="multipart/form-data" class="mt-3 grid gap-3">@csrf
+            <label class="block">@lang('laposte::app.service')<select name="service_code" class="w-full rounded border p-2 dark:bg-gray-800" required>
+                @foreach($services as $serviceCode => $service)<option value="{{ $serviceCode }}">@lang('laposte::app.service_'.$serviceCode)</option>@endforeach
+            </select></label>
             <label class="block">@lang('laposte::app.effective_from')<input name="effective_from" type="date" class="w-full rounded border p-2 dark:bg-gray-800" required></label>
             <label class="block">Source HTTPS<input name="source_url" type="url" value="https://www.laposte.fr/tarif-lettre-suivie" class="w-full rounded border p-2 dark:bg-gray-800" required></label>
             <input name="csv" type="file" accept=".csv,text/csv" required>
@@ -85,6 +93,9 @@
         <h2 class="text-xl font-semibold dark:text-white">@lang('laposte::app.preview')</h2>
         <p class="my-2 text-sm text-gray-600 dark:text-gray-300">@lang('laposte::app.preview_notice')</p>
         <form method="POST" action="{{ route('admin.laposte.preview') }}" class="grid gap-3">@csrf
+            <label class="block">@lang('laposte::app.service')<select name="service_code" class="w-full rounded border p-2 dark:bg-gray-800" required>
+                @foreach($services as $serviceCode => $service)<option value="{{ $serviceCode }}">@lang('laposte::app.service_'.$serviceCode)</option>@endforeach
+            </select></label>
             <label class="block">@lang('laposte::app.weight_g')<input name="weight_g" value="20" class="w-full rounded border p-2 dark:bg-gray-800" required></label>
             <label class="block">@lang('laposte::app.price_mode')<select name="price_mode" class="w-full rounded border p-2 dark:bg-gray-800"><option value="classic">@lang('laposte::app.classic')</option><option value="online">@lang('laposte::app.online')</option></select></label>
             <button class="primary-button" type="submit">@lang('laposte::app.preview')</button>
@@ -94,6 +105,7 @@
     <section class="box-shadow mt-5 rounded bg-white p-5 dark:bg-gray-900">
         <h2 class="text-xl font-semibold dark:text-white">@lang('laposte::app.profiles')</h2>
         <p class="my-2 text-sm text-gray-600 dark:text-gray-300">@lang('laposte::app.flat_rule')</p>
+        <p class="my-2 text-sm text-gray-600 dark:text-gray-300">@lang('laposte::app.package_rules')</p>
         <table class="w-full text-sm dark:text-gray-200">
             <tr><th>Product ID</th><th>@lang('laposte::app.eligible')</th><th>mm (L × W × T)</th><th></th></tr>
             @foreach ($profiles as $profile)
@@ -108,9 +120,9 @@
         <form method="POST" action="{{ route('admin.laposte.profiles.store') }}" class="mt-3 grid gap-3">@csrf
             <label class="block">Product ID <input name="product_id" min="1" type="number" class="w-full rounded border p-2 dark:bg-gray-800" required></label>
             <label class="block">@lang('laposte::app.eligible')<select name="eligible" class="w-full rounded border p-2 dark:bg-gray-800"><option value="1">Oui</option><option value="0">Non</option></select></label>
-            <label class="block">@lang('laposte::app.length_mm')<input name="length_mm" min="1" max="600" type="number" class="w-full rounded border p-2 dark:bg-gray-800" required></label>
-            <label class="block">@lang('laposte::app.width_mm')<input name="width_mm" min="1" max="600" type="number" class="w-full rounded border p-2 dark:bg-gray-800" required></label>
-            <label class="block">@lang('laposte::app.thickness_mm')<input name="thickness_mm" min="1" max="29" type="number" class="w-full rounded border p-2 dark:bg-gray-800" required></label>
+            <label class="block">@lang('laposte::app.length_mm')<input name="length_mm" min="1" max="1500" type="number" class="w-full rounded border p-2 dark:bg-gray-800" required></label>
+            <label class="block">@lang('laposte::app.width_mm')<input name="width_mm" min="1" max="1500" type="number" class="w-full rounded border p-2 dark:bg-gray-800" required></label>
+            <label class="block">@lang('laposte::app.thickness_mm')<input name="thickness_mm" min="1" max="1500" type="number" class="w-full rounded border p-2 dark:bg-gray-800" required></label>
             <input type="hidden" name="packing_rule" value="flat_stack">
             <button class="primary-button" type="submit">@lang('laposte::app.save')</button>
         </form>

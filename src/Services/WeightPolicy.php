@@ -14,6 +14,7 @@ final class WeightPolicy
      */
     public function totalMg(array $items, string $unit, array $settings): ?int
     {
+        $maxMg = max(1, (int) ($settings['max_weight_g'] ?? 2000)) * 1000;
         $total = 0;
         $seen = false;
         foreach ($items as $item) {
@@ -43,7 +44,7 @@ final class WeightPolicy
                 return null;
             }
             $total += $each * $qty;
-            if ($total > 2_000_000) {
+            if ($total > $maxMg) {
                 return null;
             }
         }
@@ -55,6 +56,6 @@ final class WeightPolicy
         } catch (InvalidArgumentException) {
             return null;
         }
-        return $total > 0 && $total <= 2_000_000 ? $total : null;
+        return $total > 0 && $total <= $maxMg ? $total : null;
     }
 }

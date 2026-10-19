@@ -1,11 +1,17 @@
 <?php
 
-return [
-    'laposte_lettre_suivie' => [
-        'code' => 'laposte_lettre_suivie',
-        'title' => 'La Poste – Lettre verte suivie',
-        'description' => 'Livraison suivie à domicile · Environ 3 jours ouvrables après expédition',
+use Elig45\LaPosteShipping\Services\ServiceCatalog;
+
+$carriers = [];
+
+foreach (ServiceCatalog::all() as $serviceCode => $service) {
+    $carriers[$service['carrier_code']] = [
+        'code' => $service['carrier_code'],
+        'title' => $service['title'],
+        'description' => $service['description'],
         'active' => false,
-        'class' => \Elig45\LaPosteShipping\Carriers\LettreSuivie::class,
-    ],
-];
+        'class' => $service['class'],
+    ];
+}
+
+return $carriers;

@@ -8,9 +8,9 @@ namespace Elig45\LaPosteShipping\Services;
 final class RateSelection
 {
     /** @param list<array{max_weight_g:int,classic_cents:int,online_cents:int,enabled:bool}> $tiers */
-    public function select(array $tiers, int $weightMg, string $mode): ?int
+    public function select(array $tiers, int $weightMg, string $mode, int $maxWeightMg = 2_000_000): ?int
     {
-        if ($weightMg <= 0 || $weightMg > 2_000_000 || ! in_array($mode, ['classic', 'online'], true)) {
+        if ($weightMg <= 0 || $weightMg > $maxWeightMg || ! in_array($mode, ['classic', 'online'], true)) {
             return null;
         }
         usort($tiers, static fn (array $a, array $b): int => $a['max_weight_g'] <=> $b['max_weight_g']);

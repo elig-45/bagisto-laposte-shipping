@@ -40,16 +40,16 @@
 ## À propos
 
 `elig45/bagisto-laposte-shipping` est un package Composer open source pour
-**Bagisto 2.4.13**, **Laravel 12** et **PHP 8.3–8.4**. Il ajoute la méthode
-`laposte_lettre_suivie_laposte_lettre_suivie` et applique une grille de prix
-commune à tous les canaux Bagisto.
+**Bagisto 2.4.13**, **Laravel 12** et **PHP 8.3–8.4**. Il ajoute quatre
+méthodes d'expédition configurables (Lettre verte, Lettre verte suivie, Lettre
+Services Plus et Chrono 13) et applique des grilles distinctes par service.
 
 > **Statut : version candidate.** Le calcul isolé et la syntaxe PHP sont
 > vérifiés. Une installation Bagisto réelle reste nécessaire pour valider les
 > migrations, l'administration, les taxes, les devises et le checkout complet.
 
-Le transporteur est désactivé par défaut et ne devient disponible qu'après
-confirmation explicite du conditionnement de l'enveloppe.
+Chaque méthode est désactivée par défaut et ne devient disponible qu'après
+confirmation explicite du conditionnement correspondant.
 
 ### Identité du package
 
@@ -58,12 +58,13 @@ confirmation explicite du conditionnement de l'enveloppe.
 | Package | `elig45/bagisto-laposte-shipping` |
 | Namespace | `Elig45\LaPosteShipping` |
 | Auteur | `elig-45` |
-| Transporteur | `laposte_lettre_suivie` |
+| Services | Lettre verte, Lettre verte suivie, Lettre Services Plus, Chrono 13 |
 | Licence | AGPL-3.0-or-later |
 
 ## Fonctionnalités
 
 - Calcul du tarif selon le poids total et la grille applicable.
+- Méthodes indépendantes au checkout, activables séparément par l'administrateur.
 - Tarifs « classique » et « en ligne », stockés en centimes entiers.
 - Conversion correcte des unités Bagisto `kgs` et `lbs`.
 - Poids de l'emballage, prix d'achat et majorations configurables.
@@ -76,18 +77,19 @@ confirmation explicite du conditionnement de l'enveloppe.
 
 ### Règles d'éligibilité
 
-La méthode est disponible uniquement si toutes les conditions suivantes sont
-réunies :
+Chaque méthode est disponible uniquement si toutes les conditions suivantes
+sont réunies :
 
 1. Le transporteur et la confirmation du conditionnement sont activés.
 2. La destination est en France métropolitaine (`FR`, codes `01000`–`95999`,
    Corse incluse).
 3. Chaque produit physique possède un poids strictement positif.
 4. Chaque référence dispose d'un profil de conditionnement éligible.
-5. Les articles tiennent dans l'enveloppe et leur épaisseur cumulée reste
-   strictement inférieure à 30 mm.
-6. Le poids total ne dépasse pas 2 000 g et les dimensions postales restent
-   dans les limites configurées.
+5. Pour les lettres, les articles tiennent dans l'enveloppe et leur épaisseur
+   cumulée reste strictement inférieure à 30 mm. Chrono 13 vérifie la taille du
+   colis et l'empilage dans ses dimensions extérieures configurées.
+6. Le poids total ne dépasse pas 2 000 g pour les lettres ni 30 000 g pour
+   Chrono 13.
 
 Les produits virtuels et téléchargeables ne sont pas comptabilisés. Les
 produits `bundle` et `grouped` sont refusés en v1 plutôt que d'approximer leur
@@ -135,17 +137,20 @@ composer require elig45/bagisto-laposte-shipping:@dev
 
 ## Configuration
 
-1. Ouvrez **Administration → Configuration → Ventes → Méthodes d'expédition →
-   La Poste – Lettre verte suivie**.
-2. Sélectionnez le tarif « classique » ou « en ligne ».
-3. Renseignez le poids réel de l'enveloppe et ses dimensions.
-4. Configurez si nécessaire le prix de l'enveloppe, les majorations, le seuil
+1. Ouvrez **Administration → Configuration → Ventes → Méthodes d'expédition**.
+2. Configurez séparément **La Poste – Lettre verte**, **Lettre verte suivie**,
+   **Lettre Services Plus** et **Chrono 13**. Choisissez le mode de prix
+   classique ou en ligne lorsqu'il est proposé.
+3. Pour les trois offres courrier, renseignez le poids de l'enveloppe et ses
+   dimensions. Pour Chrono 13, indiquez le poids et les dimensions extérieures
+   du colis fermé.
+4. Configurez si nécessaire le prix de l'emballage, les majorations, le seuil
    de gratuité et la politique de poids manquant.
 5. Ouvrez **Ventes → La Poste : tarifs et conditionnement**.
 6. Créez un profil pour chaque produit ou variante expédiable, avec les
-   dimensions de l'article déjà prêt à être conditionné.
-7. Activez **J'ai mesuré et vérifié…**, puis **Activer ce transporteur**.
-8. Testez une commande non payée sur chaque canal avant la mise en production.
+   dimensions de l'article prêt à être conditionné.
+7. Activez **J'ai mesuré et vérifié…**, puis activez les méthodes voulues.
+8. Vérifiez les tarifs, puis essayez chaque méthode avant sa mise en production.
 
 Le paramétrage du transporteur est global. L'unité de poids native de chaque
 canal peut rester en `kgs` ou `lbs` : la conversion est effectuée par le
@@ -158,16 +163,17 @@ Les permissions suivantes contrôlent l'administration :
 - `sales.laposte` : consultation ;
 - `sales.laposte.manage` : modification.
 
-Une grille future peut être créée, importée ou exportée avec les colonnes :
+Les grilles sont séparées par service. Une grille future peut être créée,
+importée ou exportée avec les colonnes :
 
 ```text
 max_weight_g,classic_cents,online_cents,enabled
 ```
 
-Les grilles passées sont immuables. Une grille doit toujours comporter une
-dernière tranche à 2 000 g. Une tranche désactivée rend la méthode indisponible
-pour le poids concerné ; elle ne déclenche pas silencieusement une tranche plus
-coûteuse.
+Les grilles passées sont immuables. La dernière tranche doit être à 2 000 g
+pour les lettres et 30 000 g pour Chrono 13. Une tranche désactivée rend la
+méthode indisponible pour le poids concerné ; elle ne déclenche pas
+silencieusement une tranche plus coûteuse.
 
 ### Grille initiale
 
@@ -183,8 +189,20 @@ Applicabilité : **1er janvier 2026**. Source :
 | 1 000 g | 9,79 € | 9,64 € |
 | 2 000 g | 11,64 € | 11,56 € |
 
-Le suivi est déjà inclus dans ces montants. Les frais de l'enveloppe et les
-majorations sont ajoutés séparément.
+Ces tarifs couvrent la Lettre verte suivie. Le suivi est inclus dans ses
+montants. Les frais de l'emballage et les majorations sont ajoutés séparément.
+
+Les autres grilles initiales 2026 sont fournies à l'installation :
+
+| Service | 20 g / 1 kg / 2 kg | Source |
+| --- | --- | --- |
+| Lettre verte, classique | 1,52 € / 9,29 € / 11,14 € | [La Poste](https://www.laposte.fr/tarif-lettre-verte) |
+| Lettre Services Plus, classique | 3,47 € / 10,35 € / 12,01 € | [La Poste](https://www.laposte.fr/tarifs-lettre-services-plus) |
+| Chrono 13, jusqu'à 1 kg | 23,40 € | [La Poste](https://www.laposte.fr/tarif-chronopost) |
+
+La Lettre verte suivie et la Lettre Services Plus sont affichées comme deux
+choix distincts au checkout. Chrono 13 est une livraison express à domicile ;
+ses restrictions de dimensions sont appliquées à partir du colis configuré.
 
 ## Utilisation
 
@@ -253,11 +271,12 @@ Bagisto.
 
 - France métropolitaine uniquement : Monaco, Andorre, DOM-COM et international
   sont désactivés.
-- Une commande correspond à un seul pli ; aucun découpage automatique au-delà
-  de 2 kg.
+- Une commande correspond à un seul envoi ; aucun découpage automatique si le
+  poids dépasse la limite du service choisi.
 - Le conditionnement `flat_stack` est volontairement conservateur : aucun
   pliage, rotation oblique, tassement ou placement côte à côte automatique.
-- Les dimensions globales de l'enveloppe sont saisies manuellement.
+- Les dimensions globales de l'enveloppe et du colis Chrono 13 sont saisies
+  manuellement.
 - Aucun achat d'étiquette, dépôt officiel ou suivi automatique.
 - Les règles du package ne remplacent pas les conditions générales La Poste en
   vigueur le jour du dépôt.

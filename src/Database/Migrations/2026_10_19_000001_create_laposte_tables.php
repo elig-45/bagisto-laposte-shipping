@@ -28,7 +28,7 @@ return new class extends Migration {
         });
         Schema::create('laposte_product_profiles', function (Blueprint $table): void {
             $table->id();
-            $table->unsignedBigInteger('product_id')->unique();
+            $table->unsignedInteger('product_id')->unique();
             $table->boolean('eligible')->default(false);
             $table->unsignedInteger('length_mm');
             $table->unsignedInteger('width_mm');
