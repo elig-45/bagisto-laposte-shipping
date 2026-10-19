@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MEJF\LaPosteShipping\Database\Seeders;
+namespace Elig45\LaPosteShipping\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;

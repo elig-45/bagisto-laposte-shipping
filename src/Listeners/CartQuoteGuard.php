@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace MEJF\LaPosteShipping\Listeners;
+namespace Elig45\LaPosteShipping\Listeners;
 
 use Illuminate\Http\Exceptions\HttpResponseException;
-use MEJF\LaPosteShipping\Carriers\LettreSuivie;
-use MEJF\LaPosteShipping\Services\QuoteCalculator;
+use Elig45\LaPosteShipping\Carriers\LettreSuivie;
+use Elig45\LaPosteShipping\Services\QuoteCalculator;
 use Webkul\Tax\Facades\Tax;
 
 final class CartQuoteGuard

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace MEJF\LaPosteShipping\Services;
+namespace Elig45\LaPosteShipping\Services;
 
 use Carbon\CarbonInterface;
-use MEJF\LaPosteShipping\Models\RateCard;
+use Elig45\LaPosteShipping\Models\RateCard;
 
 final class RateResolver
 {

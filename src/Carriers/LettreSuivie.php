@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace MEJF\LaPosteShipping\Carriers;
+namespace Elig45\LaPosteShipping\Carriers;
 
-use MEJF\LaPosteShipping\Services\QuoteCalculator;
+use Elig45\LaPosteShipping\Services\QuoteCalculator;
 use Webkul\Checkout\Facades\Cart;
 use Webkul\Checkout\Models\CartShippingRate;
 use Webkul\Shipping\Carriers\AbstractShipping;

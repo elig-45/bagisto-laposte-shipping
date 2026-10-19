@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /** Dependency-free smoke checks for the pricing and eligibility core. */
 spl_autoload_register(static function (string $name): void {
-    $prefix = 'MEJF\\LaPosteShipping\\';
+    $prefix = 'Elig45\\LaPosteShipping\\';
     if (! str_starts_with($name, $prefix)) {
         return;
     }
@@ -14,13 +14,13 @@ spl_autoload_register(static function (string $name): void {
     }
 });
 
-use MEJF\LaPosteShipping\Services\CsvRates;
-use MEJF\LaPosteShipping\Services\Decimal;
-use MEJF\LaPosteShipping\Services\MetropolitanFrance;
-use MEJF\LaPosteShipping\Services\PackingPolicy;
-use MEJF\LaPosteShipping\Services\PriceAdjustments;
-use MEJF\LaPosteShipping\Services\RateSelection;
-use MEJF\LaPosteShipping\Services\WeightPolicy;
+use Elig45\LaPosteShipping\Services\CsvRates;
+use Elig45\LaPosteShipping\Services\Decimal;
+use Elig45\LaPosteShipping\Services\MetropolitanFrance;
+use Elig45\LaPosteShipping\Services\PackingPolicy;
+use Elig45\LaPosteShipping\Services\PriceAdjustments;
+use Elig45\LaPosteShipping\Services\RateSelection;
+use Elig45\LaPosteShipping\Services\WeightPolicy;
 
 $assertions = 0;
 $check = static function (mixed $actual, mixed $expected, string $message) use (&$assertions): void {

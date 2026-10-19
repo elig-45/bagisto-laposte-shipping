@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MEJF\LaPosteShipping\Services;
+namespace Elig45\LaPosteShipping\Services;
 
 /**
  * A physically achievable conservative packing method, NOT volume estimation.

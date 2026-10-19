@@ -6,6 +6,6 @@ return [
         'title' => 'La Poste – Lettre verte suivie',
         'description' => 'Livraison suivie à domicile · Environ 3 jours ouvrables après expédition',
         'active' => false,
-        'class' => \MEJF\LaPosteShipping\Carriers\LettreSuivie::class,
+        'class' => \Elig45\LaPosteShipping\Carriers\LettreSuivie::class,
     ],
 ];

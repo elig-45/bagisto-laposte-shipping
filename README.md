@@ -5,7 +5,7 @@ Package Composer open source pour **Bagisto 2.4.13 / Laravel 12 / PHP 8.3–8.4*
 **Statut : version candidate, non certifiée en production.** Le calcul isolé et la syntaxe PHP ont été vérifiés ; les tests PHPUnit/Testbench et le checkout complet nécessitent encore une installation Bagisto avec ses dépendances. Le transporteur reste **désactivé par défaut** et exige la confirmation du conditionnement pour l’installation.
 
 - Package : `elig45/bagisto-laposte-shipping`
-- Namespace : `MEJF\LaPosteShipping`
+- Namespace : `Elig45\LaPosteShipping`
 - Carrier : `laposte_lettre_suivie`
 - Method : `laposte_lettre_suivie_laposte_lettre_suivie`
 - Licence : MIT
@@ -55,7 +55,7 @@ php artisan migrate --force
 
 Laravel découvre automatiquement le `LaPosteShippingServiceProvider` grâce à `composer.json` ; **aucune modification de `packages/Webkul`**, de `bootstrap/providers.php` ou du noyau Bagisto n'est requise. Le transporteur est enregistré par `Config/carriers.php`, ses paramètres par `Config/system.php`.
 
-Pour tester le package sans dépôt GitHub, copiez-le dans `packages/MEJF/LaPosteShipping` et ajoutez temporairement la source de type `path` dans le `composer.json` du projet hôte. Puis utilisez `composer require elig45/bagisto-laposte-shipping:@dev`. Les migrations sont identiques dans les deux modes.
+Pour tester le package sans dépôt GitHub, copiez-le dans `packages/Elig45/LaPosteShipping` et ajoutez temporairement la source de type `path` dans le `composer.json` du projet hôte. Puis utilisez `composer require elig45/bagisto-laposte-shipping:@dev`. Les migrations sont identiques dans les deux modes.
 
 ## Configuration globale (toutes les boutiques Bagisto)
 

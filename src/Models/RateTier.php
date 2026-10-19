@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MEJF\LaPosteShipping\Models;
+namespace Elig45\LaPosteShipping\Models;
 
 use Illuminate\Database\Eloquent\Model;
 

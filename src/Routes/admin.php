@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use MEJF\LaPosteShipping\Http\Controllers\AdminController;
+use Elig45\LaPosteShipping\Http\Controllers\AdminController;
 
 Route::get('/', [AdminController::class, 'index'])->name('index');
 Route::post('/preview', [AdminController::class, 'preview'])->name('preview');

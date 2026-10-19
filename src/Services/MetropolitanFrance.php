@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MEJF\LaPosteShipping\Services;
+namespace Elig45\LaPosteShipping\Services;
 
 /** France métropolitaine (incl. Corsica); FR alone also covers overseas territories. */
 final class MetropolitanFrance

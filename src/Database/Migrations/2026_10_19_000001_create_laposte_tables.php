@@ -37,7 +37,7 @@ return new class extends Migration {
             $table->timestamps();
             $table->foreign('product_id')->references('id')->on('products')->cascadeOnDelete();
         });
-        (new \MEJF\LaPosteShipping\Database\Seeders\Rate2026Seeder())->run();
+        (new \Elig45\LaPosteShipping\Database\Seeders\Rate2026Seeder())->run();
     }
 
     public function down(): void

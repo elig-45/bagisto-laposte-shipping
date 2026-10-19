@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace MEJF\LaPosteShipping\Providers;
+namespace Elig45\LaPosteShipping\Providers;
 
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use MEJF\LaPosteShipping\Listeners\CartQuoteGuard;
-use MEJF\LaPosteShipping\Listeners\OrderQuoteGuard;
+use Elig45\LaPosteShipping\Listeners\CartQuoteGuard;
+use Elig45\LaPosteShipping\Listeners\OrderQuoteGuard;
 
 final class LaPosteShippingServiceProvider extends ServiceProvider
 {

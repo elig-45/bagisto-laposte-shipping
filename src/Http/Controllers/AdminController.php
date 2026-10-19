@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MEJF\LaPosteShipping\Http\Controllers;
+namespace Elig45\LaPosteShipping\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -12,11 +12,11 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use InvalidArgumentException;
-use MEJF\LaPosteShipping\Models\ProductProfile;
-use MEJF\LaPosteShipping\Models\RateCard;
-use MEJF\LaPosteShipping\Services\CsvRates;
-use MEJF\LaPosteShipping\Services\Decimal;
-use MEJF\LaPosteShipping\Services\RateResolver;
+use Elig45\LaPosteShipping\Models\ProductProfile;
+use Elig45\LaPosteShipping\Models\RateCard;
+use Elig45\LaPosteShipping\Services\CsvRates;
+use Elig45\LaPosteShipping\Services\Decimal;
+use Elig45\LaPosteShipping\Services\RateResolver;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 final class AdminController extends Controller

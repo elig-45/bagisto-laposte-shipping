@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace MEJF\LaPosteShipping\Tests\Unit;
+namespace Elig45\LaPosteShipping\Tests\Unit;
 
-use MEJF\LaPosteShipping\Services\QuoteCalculator;
+use Elig45\LaPosteShipping\Services\QuoteCalculator;
 use PHPUnit\Framework\TestCase;
 
 final class ConfigurationContractTest extends TestCase

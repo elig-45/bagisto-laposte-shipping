@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace MEJF\LaPosteShipping\Tests\Integration;
+namespace Elig45\LaPosteShipping\Tests\Integration;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use MEJF\LaPosteShipping\Models\RateCard;
-use MEJF\LaPosteShipping\Services\RateResolver;
+use Elig45\LaPosteShipping\Models\RateCard;
+use Elig45\LaPosteShipping\Services\RateResolver;
 use Orchestra\Testbench\TestCase;
 
 /** Run with Orchestra Testbench and its SQLite database, independently of Bagisto core. */

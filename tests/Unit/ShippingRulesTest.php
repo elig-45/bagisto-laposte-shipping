@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace MEJF\LaPosteShipping\Tests\Unit;
+namespace Elig45\LaPosteShipping\Tests\Unit;
 
 use InvalidArgumentException;
-use MEJF\LaPosteShipping\Services\CsvRates;
-use MEJF\LaPosteShipping\Services\Decimal;
-use MEJF\LaPosteShipping\Services\MetropolitanFrance;
-use MEJF\LaPosteShipping\Services\PackingPolicy;
-use MEJF\LaPosteShipping\Services\PriceAdjustments;
-use MEJF\LaPosteShipping\Services\RateSelection;
-use MEJF\LaPosteShipping\Services\WeightPolicy;
+use Elig45\LaPosteShipping\Services\CsvRates;
+use Elig45\LaPosteShipping\Services\Decimal;
+use Elig45\LaPosteShipping\Services\MetropolitanFrance;
+use Elig45\LaPosteShipping\Services\PackingPolicy;
+use Elig45\LaPosteShipping\Services\PriceAdjustments;
+use Elig45\LaPosteShipping\Services\RateSelection;
+use Elig45\LaPosteShipping\Services\WeightPolicy;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 

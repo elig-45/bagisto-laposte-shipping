@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MEJF\LaPosteShipping\Services;
+namespace Elig45\LaPosteShipping\Services;
 
 /** Small pure service used by both the DB resolver and isolated unit tests. */
 final class RateSelection

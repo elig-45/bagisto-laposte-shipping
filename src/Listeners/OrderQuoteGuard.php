@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace MEJF\LaPosteShipping\Listeners;
+namespace Elig45\LaPosteShipping\Listeners;
 
-use MEJF\LaPosteShipping\Services\QuoteCalculator;
+use Elig45\LaPosteShipping\Services\QuoteCalculator;
 use RuntimeException;
 use Webkul\Checkout\Facades\Cart;
 use Webkul\Tax\Facades\Tax;

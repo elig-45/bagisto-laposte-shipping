@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace MEJF\LaPosteShipping\Services;
+namespace Elig45\LaPosteShipping\Services;
 
 use Illuminate\Support\Facades\Log;
-use MEJF\LaPosteShipping\Models\ProductProfile;
+use Elig45\LaPosteShipping\Models\ProductProfile;
 
 /** Translates native Bagisto 2.4 cart rows into the pure physical packing rules. */
 final class CartAdapter
