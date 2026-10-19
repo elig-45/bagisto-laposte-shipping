@@ -3,10 +3,10 @@
 [![PHP 8.3–8.4](https://img.shields.io/badge/PHP-8.3--8.4-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://www.php.net/)
 [![Laravel 12](https://img.shields.io/badge/Laravel-12-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com/)
 [![Bagisto 2.4](https://img.shields.io/badge/Bagisto-2.4-0F766E?style=for-the-badge)](https://bagisto.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
+[![License: AGPL-3.0-or-later](https://img.shields.io/badge/License-AGPL--3.0--or--later-yellow.svg?style=for-the-badge)](LICENSE)
 
 <div align="center">
-  <h1 align="center">Bagisto — La Poste Lettre verte suivie</h1>
+  <h1 align="center">Bagisto — La Poste</h1>
 
   <p align="center">
     Méthode d'expédition La Poste pour Bagisto, avec tarification par poids,
@@ -59,7 +59,7 @@ confirmation explicite du conditionnement de l'enveloppe.
 | Namespace | `Elig45\LaPosteShipping` |
 | Auteur | `elig-45` |
 | Transporteur | `laposte_lettre_suivie` |
-| Licence | MIT |
+| Licence | AGPL-3.0-or-later |
 
 ## Fonctionnalités
 
@@ -298,7 +298,7 @@ sont échappées dans les vues Blade.
 
 ## Licence
 
-Distribué sous licence MIT. Voir [LICENSE](LICENSE).
+Distribué sous licence AGPL-3.0-or-later. Voir [LICENSE](LICENSE).
 
 Ce projet est indépendant et n'est pas affilié à La Poste.
 
