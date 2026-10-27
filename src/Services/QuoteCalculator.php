@@ -50,6 +50,7 @@ final class QuoteCalculator
         }
         $settings['packing_type'] = $service['packing_type'];
         $settings['max_weight_g'] = $service['max_weight_g'];
+        $settings['package_limits'] = $service['package_limits'] ?? null;
         if (($settings['allowed_destinations'] ?? null) !== 'metropolitan_france') {
             return null;
         }

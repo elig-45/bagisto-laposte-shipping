@@ -56,10 +56,11 @@ foreach (ServiceCatalog::all() as $serviceCode => $service) {
             $text('envelope_thickness_mm', 'envelope_thickness_mm', '1', 'required|integer|between:0,29'),
         ]);
     } else {
+        $limits = $service['package_limits'];
         $fields = array_merge($fields, [
-            $text('package_length_mm', 'package_length_mm', '300', 'required|integer|between:300,1500'),
-            $text('package_width_mm', 'package_width_mm', '210', 'required|integer|between:210,1500'),
-            $text('package_height_mm', 'package_height_mm', '30', 'required|integer|between:30,1500'),
+            $text('package_length_mm', 'package_length_mm', (string) $limits['min_length_mm'], 'required|integer|between:'.$limits['min_length_mm'].','.$limits['max_length_mm']),
+            $text('package_width_mm', 'package_width_mm', (string) $limits['min_width_mm'], 'required|integer|between:'.$limits['min_width_mm'].','.$limits['max_length_mm']),
+            $text('package_height_mm', 'package_height_mm', (string) $limits['min_height_mm'], 'required|integer|between:'.$limits['min_height_mm'].','.$limits['max_length_mm']),
         ]);
     }
 
