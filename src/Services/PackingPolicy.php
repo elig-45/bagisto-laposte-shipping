@@ -49,6 +49,13 @@ final class PackingPolicy
     /** @param list<array{length_mm:int,width_mm:int,thickness_mm:int,quantity:int,eligible:bool,packing_rule:string}> $items */
     private function acceptsParcel(array $items, array $package): bool
     {
+        $limits = $package['package_limits'] ?? [
+            'min_length_mm' => 300,
+            'min_width_mm' => 210,
+            'min_height_mm' => 30,
+            'max_length_mm' => 1500,
+            'max_girth_mm' => 3000,
+        ];
         $dimensions = [
             (int) ($package['package_length_mm'] ?? 0),
             (int) ($package['package_width_mm'] ?? 0),
@@ -57,10 +64,12 @@ final class PackingPolicy
         rsort($dimensions);
         [$length, $width, $height] = $dimensions;
 
-        // Chronopost domestic parcels: at least 30 × 21 × 3 cm, at most
-        // 150 cm long and L + 2W + 2H <= 300 cm.
-        if ($length < 300 || $width < 210 || $height < 30 || $length > 1500
-            || $length + 2 * $width + 2 * $height > 3000 || $items === []) {
+        if ($length < $limits['min_length_mm']
+            || $width < $limits['min_width_mm']
+            || $height < $limits['min_height_mm']
+            || $length > $limits['max_length_mm']
+            || $length + 2 * $width + 2 * $height > $limits['max_girth_mm']
+            || $items === []) {
             return false;
         }
 

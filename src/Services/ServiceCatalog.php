@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Elig45\LaPosteShipping\Services;
 
 use Elig45\LaPosteShipping\Carriers\Chrono13;
+use Elig45\LaPosteShipping\Carriers\ColissimoHome;
 use Elig45\LaPosteShipping\Carriers\LettreSuivie;
 use Elig45\LaPosteShipping\Carriers\LettreVerte;
 use Elig45\LaPosteShipping\Carriers\ServicesPlus;
@@ -54,6 +55,26 @@ final class ServiceCatalog
                 'source_url' => 'https://www.laposte.fr/tarifs-lettre-services-plus',
                 'tiers' => [[20, 347, 341], [100, 457, 445], [250, 578, 577], [500, 810, 804], [1000, 1035, 1023], [2000, 1201, 1195]],
             ],
+            'colissimo_domicile' => [
+                'title' => 'La Poste – Colissimo domicile',
+                'description' => 'Livraison à domicile avec suivi · Délai indicatif de 2 jours ouvrables',
+                'info' => 'Colissimo domicile en France métropolitaine, jusqu’à 30 kg. Dimensions du colis fermé : minimum 22 × 11 × 1 cm, longueur maximale 100 cm et longueur + 2 × largeur + 2 × hauteur au plus 150 cm.',
+                'carrier_code' => 'laposte_colissimo_domicile',
+                'method' => 'laposte_colissimo_domicile_laposte_colissimo_domicile',
+                'class' => ColissimoHome::class,
+                'packing_type' => 'parcel',
+                'max_weight_g' => 30000,
+                'price_modes' => ['classic' => 'classic'],
+                'package_limits' => [
+                    'min_length_mm' => 220,
+                    'min_width_mm' => 110,
+                    'min_height_mm' => 10,
+                    'max_length_mm' => 1000,
+                    'max_girth_mm' => 1500,
+                ],
+                'source_url' => 'https://www.laposte.fr/tarif-colissimo',
+                'tiers' => [[250, 549, 549], [500, 759, 759], [750, 929, 929], [1000, 959, 959], [2000, 1119, 1119], [5000, 1739, 1739], [10000, 2529, 2529], [15000, 3199, 3199], [30000, 3959, 3959]],
+            ],
             'chrono_13' => [
                 'title' => 'Chronopost – Chrono 13',
                 'description' => 'Livraison express le lendemain avant 13 h en France métropolitaine',
@@ -64,6 +85,13 @@ final class ServiceCatalog
                 'packing_type' => 'parcel',
                 'max_weight_g' => 30000,
                 'price_modes' => ['classic' => 'classic'],
+                'package_limits' => [
+                    'min_length_mm' => 300,
+                    'min_width_mm' => 210,
+                    'min_height_mm' => 30,
+                    'max_length_mm' => 1500,
+                    'max_girth_mm' => 3000,
+                ],
                 'source_url' => 'https://www.laposte.fr/tarif-chronopost',
                 'tiers' => [[1000, 2340, 2340], [3000, 2520, 2520], [10000, 2880, 2880], [20000, 4080, 4080], [30000, 5400, 5400]],
             ],

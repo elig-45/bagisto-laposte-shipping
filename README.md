@@ -40,9 +40,10 @@
 ## À propos
 
 `elig45/bagisto-laposte-shipping` est un package Composer open source pour
-**Bagisto 2.4.13**, **Laravel 12** et **PHP 8.3–8.4**. Il ajoute quatre
+**Bagisto 2.4.13**, **Laravel 12** et **PHP 8.3–8.4**. Il ajoute cinq
 méthodes d'expédition configurables (Lettre verte, Lettre verte suivie, Lettre
-Services Plus et Chrono 13) et applique des grilles distinctes par service.
+Services Plus, Colissimo domicile et Chrono 13) et applique des grilles
+distinctes par service.
 
 > **Statut : version candidate.** Le calcul isolé et la syntaxe PHP sont
 > vérifiés. Une installation Bagisto réelle reste nécessaire pour valider les
@@ -58,7 +59,7 @@ confirmation explicite du conditionnement correspondant.
 | Package | `elig45/bagisto-laposte-shipping` |
 | Namespace | `Elig45\LaPosteShipping` |
 | Auteur | `elig-45` |
-| Services | Lettre verte, Lettre verte suivie, Lettre Services Plus, Chrono 13 |
+| Services | Lettre verte, Lettre verte suivie, Lettre Services Plus, Colissimo domicile, Chrono 13 |
 | Licence | AGPL-3.0-or-later |
 
 ## Fonctionnalités
@@ -86,10 +87,10 @@ sont réunies :
 3. Chaque produit physique possède un poids strictement positif.
 4. Chaque référence dispose d'un profil de conditionnement éligible.
 5. Pour les lettres, les articles tiennent dans l'enveloppe et leur épaisseur
-   cumulée reste strictement inférieure à 30 mm. Chrono 13 vérifie la taille du
-   colis et l'empilage dans ses dimensions extérieures configurées.
+   cumulée reste strictement inférieure à 30 mm. Colissimo et Chrono 13
+   vérifient le colis fermé et l'empilage dans ses dimensions configurées.
 6. Le poids total ne dépasse pas 2 000 g pour les lettres ni 30 000 g pour
-   Chrono 13.
+   Colissimo et Chrono 13.
 
 Les produits virtuels et téléchargeables ne sont pas comptabilisés. Les
 produits `bundle` et `grouped` sont refusés en v1 plutôt que d'approximer leur
@@ -139,11 +140,11 @@ composer require elig45/bagisto-laposte-shipping:@dev
 
 1. Ouvrez **Administration → Configuration → Ventes → Méthodes d'expédition**.
 2. Configurez séparément **La Poste – Lettre verte**, **Lettre verte suivie**,
-   **Lettre Services Plus** et **Chrono 13**. Choisissez le mode de prix
-   classique ou en ligne lorsqu'il est proposé.
+   **Lettre Services Plus**, **Colissimo domicile** et **Chrono 13**. Choisissez
+   le mode de prix classique ou en ligne lorsqu'il est proposé.
 3. Pour les trois offres courrier, renseignez le poids de l'enveloppe et ses
-   dimensions. Pour Chrono 13, indiquez le poids et les dimensions extérieures
-   du colis fermé.
+   dimensions. Pour Colissimo et Chrono 13, indiquez le poids et les dimensions
+   extérieures du colis fermé.
 4. Configurez si nécessaire le prix de l'emballage, les majorations, le seuil
    de gratuité et la politique de poids manquant.
 5. Ouvrez **Ventes → La Poste : tarifs et conditionnement**.
@@ -171,8 +172,8 @@ max_weight_g,classic_cents,online_cents,enabled
 ```
 
 Les grilles passées sont immuables. La dernière tranche doit être à 2 000 g
-pour les lettres et 30 000 g pour Chrono 13. Une tranche désactivée rend la
-méthode indisponible pour le poids concerné ; elle ne déclenche pas
+pour les lettres et 30 000 g pour Colissimo et Chrono 13. Une tranche
+désactivée rend la méthode indisponible pour le poids concerné ; elle ne déclenche pas
 silencieusement une tranche plus coûteuse.
 
 ### Grille initiale
@@ -198,11 +199,17 @@ Les autres grilles initiales 2026 sont fournies à l'installation :
 | --- | --- | --- |
 | Lettre verte, classique | 1,52 € / 9,29 € / 11,14 € | [La Poste](https://www.laposte.fr/tarif-lettre-verte) |
 | Lettre Services Plus, classique | 3,47 € / 10,35 € / 12,01 € | [La Poste](https://www.laposte.fr/tarifs-lettre-services-plus) |
+| Colissimo domicile, 250 g / 1 kg / 2 kg / 30 kg | 5,49 € / 9,59 € / 11,19 € / 39,59 € | [La Poste](https://www.laposte.fr/tarif-colissimo) |
 | Chrono 13, jusqu'à 1 kg | 23,40 € | [La Poste](https://www.laposte.fr/tarif-chronopost) |
 
 La Lettre verte suivie et la Lettre Services Plus sont affichées comme deux
-choix distincts au checkout. Chrono 13 est une livraison express à domicile ;
-ses restrictions de dimensions sont appliquées à partir du colis configuré.
+choix distincts au checkout. Colissimo domicile et Chrono 13 sont des méthodes
+de colis séparées, proposées seulement lorsque le poids, le profil produit et
+les dimensions configurées sont compatibles. Pour Colissimo, les limites
+utilisées sont 30 kg, une longueur de 100 cm et une somme
+`longueur + 2 × largeur + 2 × hauteur` de 150 cm au plus. Les dimensions
+minimales configurées sont 22 × 11 × 1 cm. Chrono 13 reste une option express
+distincte avec ses propres limites.
 
 ## Utilisation
 
@@ -275,7 +282,8 @@ Bagisto.
   poids dépasse la limite du service choisi.
 - Le conditionnement `flat_stack` est volontairement conservateur : aucun
   pliage, rotation oblique, tassement ou placement côte à côte automatique.
-- Les dimensions globales de l'enveloppe et du colis Chrono 13 sont saisies
+- Les dimensions globales de l'enveloppe, du colis Colissimo et du colis Chrono 13
+  sont saisies
   manuellement.
 - Aucun achat d'étiquette, dépôt officiel ou suivi automatique.
 - Les règles du package ne remplacent pas les conditions générales La Poste en

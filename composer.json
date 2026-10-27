@@ -1,6 +1,6 @@
 {
     "name": "elig45/bagisto-laposte-shipping",
-    "description": "La Poste Lettre verte suivie carrier with global weight-based pricing for Bagisto 2.4",
+    "description": "Configurable La Poste letter and parcel shipping rates for Bagisto 2.4",
     "type": "library",
     "license": "AGPL-3.0-or-later",
     "authors": [
